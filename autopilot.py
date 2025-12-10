@@ -12,7 +12,6 @@ turn_start_alt = 10000
 turn_end_alt = 45000
 
 def setup_staging():
-    print("Инициализация автопилота...")
     vessel.control.throttle = 1.0
     vessel.control.sas = False
     vessel.control.rcs = False
@@ -22,16 +21,11 @@ def setup_staging():
     time.sleep(1)
 
 def launch():
-
-    
-    print('Запуск!')
     vessel.control.activate_next_stage()
     time.sleep(2)
     
     while vessel.flight().surface_altitude < 10:
         time.sleep(0.1)
-    
-    print('Взлет!')
     
     # Вертикальный подъем
     while vessel.flight().mean_altitude < turn_start_alt:
@@ -53,7 +47,6 @@ def launch():
         time.sleep(0.1)
     
     # Вывод на орбиту
-    print('Вывод на орбиту')
     ap.target_pitch_and_heading(0, 90)
     
     # Основной цикл - двигатели работают до достижения орбиты
@@ -66,13 +59,10 @@ def launch():
     
     # ТОЛЬКО после достижения орбиты выключаем двигатели
     vessel.control.throttle = 0.0
-    print('Достигнута орбита!')
 
 
 def landing():
     altitude = conn.add_stream(getattr, vessel.flight(), 'surface_altitude')
-
-    print("Начинаем процедуру посадки...")
 
     # Ориентируем корабль вертикально (двигателем вниз)
     ap.target_pitch_and_heading(180, 90)
@@ -101,7 +91,6 @@ def check_staging_during_flight():
         
         # Если нет активных двигателей, но полет продолжается - активируем следующую ступень
         if not active_engines and vessel.flight().mean_altitude < target_altitude - 10000:
-            print("Нет активных двигателей - активация следующей ступени")
             vessel.control.activate_next_stage()
             time.sleep(1)
             return
@@ -109,7 +98,6 @@ def check_staging_during_flight():
         # Проверяем, есть ли у активных двигателей топливо
         for engine in active_engines:
             if not engine.has_fuel:
-                print(f"Двигатель {engine.part.title} без топлива - отделение ступени")
                 vessel.control.activate_next_stage()
                 time.sleep(1)
                 return
@@ -117,7 +105,6 @@ def check_staging_during_flight():
         # Дополнительная проверка по расходу топлива
         resources = vessel.resources_in_decouple_stage(vessel.control.current_stage - 1)
         if resources and resources.amount('LiquidFuel') < 5.0:
-            print("Топливо в текущей ступени на исходе - отделение")
             vessel.control.activate_next_stage()
             time.sleep(1)
             
@@ -131,9 +118,9 @@ if __name__ == '__main__':
         time.sleep(60)
         landing()
         ap.disengage()
-        print("Миссия завершена успешно!")
     except Exception as e:
         print(f"Ошибка: {e}")
         vessel.control.throttle = 0.0
         ap.disengage()
+
 
