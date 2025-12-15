@@ -1,5 +1,4 @@
 import krpc
-import matplotlib.pyplot as plt
 import time
 
 conn = krpc.connect()
@@ -128,3 +127,4 @@ launch()
 time.sleep(60)
 landing()
 ap.disengage()
+
