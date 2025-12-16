@@ -8,6 +8,10 @@ M = 6 * 10**24
 r = 6.4 * 10**6    
 dt = 0.1  
 total_time = 225
+p0 = 101325 
+H = 7500  
+drag_coef = 0.6
+area = 4  
 
 # начальные условия
 t = 0
@@ -22,21 +26,19 @@ m = M1
 
 Pn_1 = 4000000
 Pn_2 = 900000
-Sa = 4 
+Sa = 0.04 
 
 # массовый расход
 def get_m(t):
     return M1 - k*t
 
 # давление атмосферы
-def p_a(h):    
-    p0 = 101325 
-    H = 7500     
+def p_a(h):       
     return p0 * np.exp(-h / H)
 
 # плотность воздуха
 def get_density(h):
-    return 1.225 * np.exp(-h / 7500)
+    return 1.225 * np.exp(-h / H)
 
 # считаем как меняется g, от высоты
 def get_g(h):
@@ -66,8 +68,6 @@ while t < total_time:
     
     # сопротивление воздуха 
     density = get_density(h)
-    drag_coef = 0.6
-    area = 2  
     drag = 0.5 * density * v**2 * drag_coef * area
     
     # разложение сопротивления
@@ -93,7 +93,7 @@ while t < total_time:
 
     m = get_m(t)
 
-# Высота
+# График 1 Высота
 plt.figure(figsize=(10, 6))
 plt.plot(times, heights, label='МАТ МОДЕЛЬ')
 plt.plot(times_ksp, altitudes_ksp, label='ДАННЫЕ KSP')
@@ -102,7 +102,7 @@ plt.xlabel('Время (с)')
 plt.ylabel('Высота (м)')
 plt.title('Высота ракеты')
 plt.grid(True)
-# Скорость
+# График 2 Скорость
 plt.figure(figsize=(10, 6))
 plt.plot(times, velocities, label='МАТ МОДЕЛЬ')
 plt.plot(times_ksp, speeds_ksp, label='ДАННЫЕ KSP')
@@ -111,6 +111,8 @@ plt.xlabel('Время (с)')
 plt.ylabel('Скорость (м/с)')
 plt.title('Скорость ракеты')
 plt.grid(True)
+
+
 
 plt.tight_layout()
 plt.show()
